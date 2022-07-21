@@ -1,7 +1,8 @@
-import {Controller,Get,Post, Req, UploadedFile, UseGuards, UseInterceptors, } from '@nestjs/common'
+import {Controller,Delete,Get,Param,Post, Req, UploadedFile, UseGuards, UseInterceptors, } from '@nestjs/common'
 import { AuthGuard } from '@nestjs/passport'
 import { FileInterceptor } from '@nestjs/platform-express'
 import { Request, Express } from 'express'
+import RequestWithUser from 'src/auth/interface/requestWithUser'
 import { CreateUserDto } from './dto/createUser.dto'
 import { UserService } from './user.service'
 
@@ -19,7 +20,29 @@ export class UserController{
     }
 
     @Get('me')
-    getMe(@Req() req: Request): Express.User{
+    getMe(@Req() req: RequestWithUser): Express.User{
         return req.user
+    }
+
+    @Get(':id')
+    getById(@Req() req: RequestWithUser): Express.User{
+        return this.userService.findOneById(req.user.id)
+    }
+
+    @Get()
+    getAll(){
+        return this.userService.findAll()
+    }
+
+    // @UseGuards()
+    @Delete(':id')
+    deleteById(@Req() req: RequestWithUser,@Param('id') id: number ){
+        return this.userService.deleteOneById(id)
+    }
+
+    @Delete('me')
+    async deleteMe(@Req() req: RequestWithUser){
+        await this.userService.deleteOneById(req.user.id)
+        return 'Your account deleted successfully!'
     }
 }

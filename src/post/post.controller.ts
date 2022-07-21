@@ -4,6 +4,8 @@ import { PostService } from './post.service';
 import { Post as PostEntity } from './post.entity';
 import { PostDto } from './dto/post.dto';
 
+
+@UseGuards(AuthGuard('jwt'))
 @Controller('posts')
 export class PostController {
     constructor(private readonly postService: PostService) { }

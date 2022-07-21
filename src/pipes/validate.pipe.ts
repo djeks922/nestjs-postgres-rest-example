@@ -14,7 +14,6 @@ export class ValidateInputPipe extends ValidationPipe {
    }
 
    private handleError(errors) {
-        console.log(errors)
         return errors.message.map(error => {
             const obj = {}
             const key = error.split(' ')[0]

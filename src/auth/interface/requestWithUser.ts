@@ -4,7 +4,7 @@ import { User } from 'src/user/user.entity';
 
  
 interface RequestWithUser extends Request {
-  user: UserDto;
+  user: Omit<UserDto,'password'>;
 }
  
 export default RequestWithUser;
