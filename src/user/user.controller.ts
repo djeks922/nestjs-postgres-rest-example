@@ -2,8 +2,7 @@ import {Controller,Delete,Get,Param,Post, Req, UploadedFile, UseGuards, UseInter
 import { AuthGuard } from '@nestjs/passport'
 import { FileInterceptor } from '@nestjs/platform-express'
 import { Request, Express } from 'express'
-import RequestWithUser from 'src/auth/interface/requestWithUser'
-import { CreateUserDto } from './dto/createUser.dto'
+import {RequestWithUser} from 'src/auth/interface/requestWithUser'
 import { UserService } from './user.service'
 
 @UseGuards(AuthGuard('jwt'))
@@ -14,8 +13,9 @@ export class UserController{
 
     @Post('avatar')
     @UseInterceptors(FileInterceptor('avatar'))
-    addAvatar(@UploadedFile() file: Express.Multer.File, @Req() req: Request): string{
-        this.userService.uploadUserAvatar(req.user,file)
+    addAvatar(@UploadedFile() file: Express.Multer.File, @Req() req: RequestWithUser): string{
+        console.log(file)
+        this.userService.uploadUserAvatar(req.user.id,file.buffer,file.originalname)
         return 'uploaded!'
     }
 

@@ -1,4 +1,5 @@
-import { Table, Column, Model, DataType } from 'sequelize-typescript';
+import { Table, Column, Model, DataType, HasOne, ForeignKey, BelongsTo } from 'sequelize-typescript';
+import PublicFile from 'src/files/files.entity';
 
 @Table
 export class User extends Model<User> {
@@ -21,11 +22,14 @@ export class User extends Model<User> {
     })
     password: string;
     
+    @BelongsTo(()=> PublicFile)
+    avatar?: PublicFile;
+
+    @ForeignKey(() => PublicFile)
     @Column({
-        type: DataType.STRING,
-        allowNull: true,
+        type: DataType.INTEGER
     })
-    avatar?: string;
+    avatarID?: number
 
     @Column({
         type: DataType.ENUM,
