@@ -2,7 +2,7 @@ import {Controller,Get,Post, Req, UploadedFile, UseGuards, UseInterceptors, } fr
 import { AuthGuard } from '@nestjs/passport'
 import { FileInterceptor } from '@nestjs/platform-express'
 import { Request, Express } from 'express'
-import { UserDto } from './dto/user.dto'
+import { CreateUserDto } from './dto/createUser.dto'
 import { UserService } from './user.service'
 
 @UseGuards(AuthGuard('jwt'))
