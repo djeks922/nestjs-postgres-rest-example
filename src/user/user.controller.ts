@@ -1,19 +1,25 @@
-import {Controller,Get,Post} from '@nestjs/common'
+import {Controller,Get,Post, Req, UploadedFile, UseGuards, UseInterceptors, } from '@nestjs/common'
+import { AuthGuard } from '@nestjs/passport'
+import { FileInterceptor } from '@nestjs/platform-express'
+import { Request, Express } from 'express'
+import { UserDto } from './dto/user.dto'
+import { UserService } from './user.service'
 
-
-
-@Controller('user')
+@UseGuards(AuthGuard('jwt'))
+@Controller('users')
 export class UserController{
 
-    constructor(){}
+    constructor(private userService: UserService ){}
 
-    @Get()
-    getAll(): string{
-        return 'Fetched all users!'
+    @Post('avatar')
+    @UseInterceptors(FileInterceptor('avatar'))
+    addAvatar(@UploadedFile() file: Express.Multer.File, @Req() req: Request): string{
+        this.userService.uploadUserAvatar(req.user,file)
+        return 'uploaded!'
     }
 
-    @Post()
-    create(): string{
-        return 'User created!'
+    @Get('me')
+    getMe(@Req() req: Request): Express.User{
+        return req.user
     }
 }
