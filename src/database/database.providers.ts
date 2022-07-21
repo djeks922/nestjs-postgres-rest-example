@@ -1,4 +1,5 @@
 import { Sequelize } from 'sequelize-typescript';
+import PublicFile from 'src/files/files.entity';
 import { Post } from 'src/post/post.entity';
 import { User } from 'src/user/user.entity';
 import { SEQUELIZE, DEVELOPMENT, TEST, PRODUCTION } from '../constants';
@@ -24,7 +25,7 @@ export const databaseProviders = [{
         }
         const sequelize = new Sequelize(config);
         sequelize.options.logging = Boolean(process.env.DB_LOGGING)
-        sequelize.addModels([User,Post]);
+        sequelize.addModels([User,Post,PublicFile]);
         await sequelize.sync();
         return sequelize;
     },

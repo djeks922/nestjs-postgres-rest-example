@@ -1,10 +1,9 @@
-import { Controller, Body, Post, UseGuards, Req, UseInterceptors, UploadedFile, HttpCode } from '@nestjs/common';
+import { Controller, Body, Post, UseGuards, Req, HttpCode } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { AuthService } from './auth.service';
 import { CreateUserDto } from '../user/dto/createUser.dto';
 import { DoesUserExist } from 'src/guards/doesUserExists.guard';
-import { Request } from 'express';
-import RequestWithUser from './interface/requestWithUser';
+import {RequestWithUser} from './interface/requestWithUser';
 
 @Controller('auth')
 export class AuthController {
