@@ -1,5 +1,6 @@
-import { Table, Column, Model, DataType, HasOne, ForeignKey, BelongsTo } from 'sequelize-typescript';
+import { Table, Column, Model, DataType, HasOne, ForeignKey, BelongsTo, HasMany } from 'sequelize-typescript';
 import PublicFile from 'src/files/files.entity';
+import PrivateFile from 'src/privateFiles/privateFiles.entity';
 
 @Table
 export class User extends Model<User> {
@@ -30,6 +31,9 @@ export class User extends Model<User> {
         type: DataType.INTEGER
     })
     avatarID?: number
+
+    @HasMany(() => PrivateFile)
+    files: PrivateFile[]
 
     @Column({
         type: DataType.ENUM,

@@ -1,7 +1,7 @@
-import {Controller,Delete,Get,Param,Post, Req, UploadedFile, UseGuards, UseInterceptors, } from '@nestjs/common'
+import {Controller,Delete,Get,Param,Post, Req, Res, UploadedFile, UseGuards, UseInterceptors, } from '@nestjs/common'
 import { AuthGuard } from '@nestjs/passport'
 import { FileInterceptor } from '@nestjs/platform-express'
-import { Request, Express } from 'express'
+import { Request, Express, Response } from 'express'
 import {RequestWithUser} from 'src/auth/interface/requestWithUser'
 import { UserService } from './user.service'
 
@@ -17,6 +17,19 @@ export class UserController{
         console.log(file)
         this.userService.uploadUserAvatar(req.user.id,file.buffer,file.originalname)
         return 'uploaded!'
+    }
+
+    @Post('files')
+    @UseInterceptors(FileInterceptor('file'))
+    async addPrivateFile(@Req() request: RequestWithUser, @UploadedFile() file: Express.Multer.File) {
+      return this.userService.addPrivateFile(request.user.id, file.buffer, file.originalname);
+    //   return 'files'
+    }
+
+    @Get('files/:id')
+    async getPrivateFile( @Req() request: RequestWithUser,@Param('id') id: number,@Res() res: Response){
+        const file = await this.userService.getPrivateFile(request.user.id, Number(id));
+        file.stream.pipe(res)
     }
 
     @Get('me')
