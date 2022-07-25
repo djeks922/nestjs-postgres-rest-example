@@ -1,9 +1,11 @@
-import { Table, Column, Model, DataType, HasOne, ForeignKey, BelongsTo, HasMany } from 'sequelize-typescript';
+import { Exclude } from 'class-transformer';
+import { Table, Column, Model, DataType, ForeignKey, BelongsTo, HasMany } from 'sequelize-typescript';
 import PublicFile from 'src/files/files.entity';
 import PrivateFile from 'src/privateFiles/privateFiles.entity';
+import { CreateUserDto } from './dto/createUser.dto';
 
 @Table
-export class User extends Model<User> {
+export class User extends Model<User,CreateUserDto> {
     @Column({
         type: DataType.STRING,
         allowNull: false,
@@ -41,4 +43,11 @@ export class User extends Model<User> {
         allowNull: false,
     })
     gender: string;
+
+    @Exclude()
+    @Column({
+        type: DataType.STRING,
+        allowNull: true
+    })
+    refreshToken: string;
 }

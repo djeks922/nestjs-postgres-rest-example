@@ -1,9 +1,14 @@
+import PublicFile from "src/files/files.entity";
+import PrivateFile from "src/privateFiles/privateFiles.entity";
+
 export class UserDto{
-    username: string;
     name: string;
     gender: string;
     id: number;
     email: string;
     password: string;
-    avatar: string;
+    avatarID?: number;
+    files?: PrivateFile[];
+    avatar?: PublicFile;
+    refreshToken?: string
 }

@@ -2,6 +2,7 @@ import { Injectable, Inject, HttpException, UnauthorizedException } from '@nestj
 import { User } from './user.entity';
 import { CreateUserDto } from './dto/createUser.dto';
 import { USER_REPOSITORY } from '../constants';
+import * as bcrypt from 'bcrypt';
 import { FilesService } from 'src/files/files.service';
 import { PrivateFilesService } from 'src/privateFiles/privateFiles.service';
 import { UserDto } from './dto/user.dto';
@@ -45,6 +46,26 @@ export class UserService {
       return result 
     }
     throw new UnauthorizedException()
+  }
+
+  async setCurrentRefreshToken(refreshToken: string, userId: number) {
+    const currentHashedRefreshToken = await bcrypt.hash(refreshToken, 10);
+    await this.userRepository.update({refreshToken: currentHashedRefreshToken}, {
+      where: {id:userId}
+    });
+  }
+
+  async getUserIfRefreshTokenMatches(refreshToken: string, userId: number) {
+    let user = await this.findOneById(userId);
+    user = user['dataValues']
+    const isRefreshTokenMatching = await bcrypt.compare(
+      refreshToken,
+      user.refreshToken
+    );
+ 
+    if (isRefreshTokenMatching) {
+      return user;
+    }
   }
 
   async findOneByEmail(email: string): Promise<User> {

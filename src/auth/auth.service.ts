@@ -1,6 +1,7 @@
-import { Injectable } from '@nestjs/common';
+import { ConsoleLogger, Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
+import { CreateUserDto } from 'src/user/dto/createUser.dto';
 import { UserDto } from 'src/user/dto/user.dto';
 import { User } from 'src/user/user.entity';
 import { UserService } from '../user/user.service';
@@ -32,30 +33,50 @@ export class AuthService {
     return result;
   }
 
-  public async login(user: Partial<UserDto>) {
-    const token = await this.generateToken({ id: user.id, email: user.email, name: user.name, gender: user.gender});
-    return { user, token };
+  public async login(user: Omit<UserDto,'password'>) {
+
+    const payload = { 
+      id: user.id, 
+      email: user.email, 
+      name: user.name, 
+      gender: user.gender
+    }
+
+    const accesstoken = await this.generateAccessToken(payload);
+    const refreshtoken = await this.generateRefreshToken(payload);
+    delete user.refreshToken
+
+    await this.userService.setCurrentRefreshToken(refreshtoken,user.id)
+    return { user, tokens:{accesstoken,refreshtoken} };
   }
 
-  public async create(user) {
+  public async create(user: CreateUserDto) {
     // hash the password
     const pass = await this.hashPassword(user.password);
 
     // create the user
     const newUser = await this.userService.create({ ...user, password: pass });
-
+    console.log(newUser.get())
     // tslint:disable-next-line: no-string-literal
-    const { password, ...result } = newUser['dataValues'];
+    const { password, ...result } = newUser.get({plain:true});
 
-    // generate token
-    const token = await this.generateToken(result);
+    const plainUser: Omit<UserDto,'password'> = result as Omit<UserDto,'password'> 
 
-    // return the user and the token
-    return { user: result, token };
+    // then login
+    return await this.login(plainUser);
+  }
+  
+  public async logout(userId: number) {
+    // hash the password
+   return await this.userService.updateOneById(userId,{refreshToken:null})
   }
 
-  private async generateToken(payload: TokenPayload) {
-    const token = await this.jwtService.signAsync(payload);
+  private async generateAccessToken(payload: TokenPayload) {
+    const token = await this.jwtService.signAsync(payload,{expiresIn: process.env.JWT_ACCESS_EXPIRES,secret: process.env.JWT_ACCESS_SECRET});
+    return token;
+  }
+  private async generateRefreshToken(payload: TokenPayload) {
+    const token = await this.jwtService.signAsync(payload,{expiresIn: process.env.JWT_REFRESH_EXPIRES,secret: process.env.JWT_REFRESH_SECRET});
     return token;
   }
 

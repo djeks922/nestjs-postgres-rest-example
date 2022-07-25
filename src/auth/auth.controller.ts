@@ -20,4 +20,18 @@ export class AuthController {
     async signUp(@Body() user: CreateUserDto) {
         return await this.authService.create(user);
     }
+    @UseGuards(AuthGuard('jwt-refresh-token'))
+    @HttpCode(200)
+    @Post('refresh')
+    async refresh(@Req() req: RequestWithUser) {
+        console.log(req.user)
+        return await this.authService.login(req.user);
+    }
+    @UseGuards(AuthGuard('jwt'))
+    @Post('logout')
+    @HttpCode(200)
+    async logout(@Req() req: RequestWithUser) {
+        console.log(req.user)
+        return await this.authService.logout(req.user.id);
+    }
 }
